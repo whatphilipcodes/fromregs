@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "fromregs"
+version = "0.1.0"
+description = "Analogous to 'fromfilename' but adding the option to configure regex patterns to filter results."
+authors = ["whatphilipcodes <hello@whatphilipdoes.com>"]
+readme = "README.md"
+
+packages = [{ include = "beetsplug" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+beets = "^2.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
