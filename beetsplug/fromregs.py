@@ -132,7 +132,20 @@ class FromRegs(plugins.BeetsPlugin):
                 self._log.info("Title replaced with: {}".format(item.title))
 
             if "track" in match_dict[item] and item.track == 0:
-                item.track = int(match_dict[item]["track"])
+                track = match_dict[item]["track"].strip()
+                # Only apply the title if it is not equal to the inferred artist or title
+                if track == item.title.strip():
+                    self._log.debug(
+                        "Track: " + track + " is similar to title. Skipping..."
+                    )
+                    return
+                elif track == item.artist.strip():
+                    self._log.debug(
+                        "Track: " + track + " is similar to artist. Skipping..."
+                    )
+                    return
+
+                item.track = int(track)
                 self._log.info("Track replaced with: {}".format(item.track))
 
     def filename_task(self, task):
