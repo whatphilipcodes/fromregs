@@ -4,7 +4,7 @@ Analogous to [fromfilename](https://github.com/beetbox/beets/blob/master/beetspl
 
 ## Installation
 
-Directly inject from from this repository:
+Directly inject from this repository:
 
 ```shell
 pipx inject beets git+https://github.com/whatphilipcodes/fromregs
