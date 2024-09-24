@@ -22,10 +22,10 @@ DEFAULT_CONFIG: JSONDict = {
         r"^(?P<title>.+)$",
     ],
     "bad_title_matchlist": [r"^$"],
-    "artist_post_sub": [],
-    "title_post_sub": [],
-    "track_post_sub": [],
-    "final_trim": True,
+    "artist_post_sub": [r"\s{2,}"],
+    "title_post_sub": [r"\s{2,}"],
+    "final_strip": True,
+    "fill_album_from_title": True,
 }
 
 
@@ -118,8 +118,14 @@ class FromRegs(plugins.BeetsPlugin):
 
             for item in match_dict:
                 if not item.artist:
-                    item.artist = artist
-                    self._log.info("Artist replaced with: {}".format(item.artist))
+                    if self.config["artist_post_sub"]:
+                        for pattern in self.config["artist_post_sub"].as_str_seq():
+                            artist = re.sub(pattern, "", artist)
+                    if self.config["final_strip"]:
+                        item.artist = artist.strip()
+                    else:
+                        item.artist = artist
+                    self._log.info("Artist replaced with: '{}'".format(item.artist))
 
         # no artist field: remaining field is the title.
         else:
@@ -128,8 +134,15 @@ class FromRegs(plugins.BeetsPlugin):
         # apply the title and track.
         for item in match_dict:
             if self.bad_title(item.title):
-                item.title = str(match_dict[item][title_field])
-                self._log.info("Title replaced with: {}".format(item.title))
+                title = str(match_dict[item][title_field])
+                if self.config["title_post_sub"]:
+                    for pattern in self.config["title_post_sub"].as_str_seq():
+                        title = re.sub(pattern, "", title)
+                if self.config["final_strip"]:
+                    item.title = title.strip()
+                else:
+                    item.title = title
+                self._log.info("Title replaced with: '{}'".format(item.title))
 
             if "track" in match_dict[item] and item.track == 0:
                 track = match_dict[item]["track"].strip()
@@ -146,7 +159,7 @@ class FromRegs(plugins.BeetsPlugin):
                     return
 
                 item.track = int(track)
-                self._log.info("Track replaced with: {}".format(item.track))
+                self._log.info("Track replaced with: '{}'".format(item.track))
 
     def filename_task(self, task):
         """Examine each item in the task to see if we can extract a title
@@ -180,3 +193,8 @@ class FromRegs(plugins.BeetsPlugin):
                     self.apply_matches(match_dict)
                 else:
                     self._log.debug("No match found.")
+
+        for item in items:
+            if self.config["fill_album_from_title"] and item.album == "":
+                self._log.debug("Album could not be inferred. Using title instead...")
+                item.album = item.title
