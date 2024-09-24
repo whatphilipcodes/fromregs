@@ -25,7 +25,7 @@ DEFAULT_CONFIG: JSONDict = {
     "artist_post_sub": [r"\s{2,}"],
     "title_post_sub": [r"\s{2,}"],
     "final_strip": True,
-    "fill_album_from_title": True,
+    "fill_album_from_title": False,
 }
 
 

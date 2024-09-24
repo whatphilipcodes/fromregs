@@ -38,7 +38,7 @@ fromregs:
   artist_post_sub: ['\s{2,}']
   title_post_sub: ['\s{2,}']
   final_strip: yes
-  fill_album_from_title: yes
+  fill_album_from_title: no
 ```
 
 ## Reference
@@ -59,4 +59,4 @@ Removes parts of the title result that match with this list as a post-processing
 If true, removes excess white space on all results individually as the last step before applying the results.
 
 `fill_album_from_title`<br>
-Uses the title as album in order to provide more relevant search results if there is no album present in the filename.
+Uses the title as album, if that matches your search strategy.
