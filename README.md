@@ -13,9 +13,9 @@ pipx inject beets git+https://github.com/whatphilipcodes/fromregs
 Then add the plugin to your config:
 
 ```yaml
-[...]
+
+---
 plugins: fromregs [...]
-[...]
 ```
 
 ## Configuration
