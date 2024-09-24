@@ -36,7 +36,7 @@ fromregs:
     ]
   bad_title_matchlist: ["^$"]
   artist_post_sub: ['\s{2,}']
-  title_post_sub: ['\s{2,}']
+  title_post_sub: ['\[.*?\]', '\s{2,}']
   final_strip: yes
   fill_album_from_title: no
 ```

@@ -23,7 +23,7 @@ DEFAULT_CONFIG: JSONDict = {
     ],
     "bad_title_matchlist": [r"^$"],
     "artist_post_sub": [r"\s{2,}"],
-    "title_post_sub": [r"\s{2,}"],
+    "title_post_sub": [r"\[.*?\]", r"\s{2,}"],
     "final_strip": True,
     "fill_album_from_title": False,
 }
