@@ -26,6 +26,7 @@ DEFAULT_CONFIG: JSONDict = {
     "title_post_sub": [r"\[.*?\]", r"\s{2,}"],
     "final_strip": True,
     "fill_album_from_title": False,
+    "limit_tracknumber": 25,
 }
 
 
@@ -59,6 +60,13 @@ def all_matches(names, pattern):
         else:
             return None
     return matches
+
+
+def get_filename(item):
+    """Returns the name of a file referenced by a beets item without file extension"""
+    path = displayable_path(item.path)
+    name, _ = os.path.splitext(os.path.basename(path))
+    return name
 
 
 # plugin structure and hook into import process.
@@ -134,7 +142,11 @@ class FromRegs(plugins.BeetsPlugin):
         # apply the title and track.
         for item in match_dict:
             if self.bad_title(item.title):
-                title = str(match_dict[item][title_field])
+                if "title" in match_dict[item]:
+                    title = str(match_dict[item][title_field])
+                else:
+                    title = str(get_filename(item))
+
                 if self.config["title_post_sub"]:
                     for pattern in self.config["title_post_sub"].as_str_seq():
                         title = re.sub(pattern, "", title)
@@ -145,21 +157,20 @@ class FromRegs(plugins.BeetsPlugin):
                 self._log.info("Title replaced with: '{}'".format(item.title))
 
             if "track" in match_dict[item] and item.track == 0:
-                track = match_dict[item]["track"].strip()
-                # Only apply the title if it is not equal to the inferred artist or title
-                if track == item.title.strip():
+                track = int(match_dict[item]["track"].strip())
+                if track <= self.config["limit_tracknumber"].as_number():
+                    if str(track) == item.artist:
+                        self._log.debug(
+                            "Track {} is similar to artist and was skipped.", track
+                        )
+                    else:
+                        item.track = track
+                        self._log.info("Track replaced with: '{}'".format(item.track))
+                else:
                     self._log.debug(
-                        "Track: " + track + " is similar to title. Skipping..."
+                        "Track exceeds configured limit of: {}",
+                        str(self.config["limit_tracknumber"].as_number()),
                     )
-                    return
-                elif track == item.artist.strip():
-                    self._log.debug(
-                        "Track: " + track + " is similar to artist. Skipping..."
-                    )
-                    return
-
-                item.track = int(track)
-                self._log.info("Track replaced with: '{}'".format(item.track))
 
     def filename_task(self, task):
         """Examine each item in the task to see if we can extract a title
@@ -179,9 +190,7 @@ class FromRegs(plugins.BeetsPlugin):
             # get the base filenames (no path or extension).
             names = {}
             for item in items:
-                path = displayable_path(item.path)
-                name, _ = os.path.splitext(os.path.basename(path))
-                names[item] = name
+                names[item] = get_filename(item)
 
             # look for useful information in the filenames.
 
