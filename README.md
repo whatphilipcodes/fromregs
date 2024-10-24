@@ -38,7 +38,13 @@ fromregs:
   artist_post_sub: ['\s{2,}']
   title_post_sub: ['\[.*?\]', '\s{2,}']
   final_strip: yes
-  fill_album_from_title: no
+  fill_album_from_title: no,
+  limit_tracknumber: 25,
+```
+
+If you are trying to come up with your own regex patterns this plugin delivers more detailed logs when running verbose at level 2:
+```bash
+beet -vv import path/to/track(s)
 ```
 
 ## Reference
@@ -60,3 +66,6 @@ If true, removes excess white space on all results individually as the last step
 
 `fill_album_from_title`<br>
 Uses the title as album, if that matches your search strategy.
+
+`limit_tracknumber`<br>
+Threshold to decide wether a number should be treated as a track or only used for album, artist and title names.
